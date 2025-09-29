@@ -12,7 +12,7 @@ database-migrate:
 	poetry run alembic upgrade head
 
 database-migrate-down:
-	poetry runalembic downgrade -1
+	poetry run alembic downgrade -1
 
 database-create-migration:
 	poetry run alembic revision --autogenerate -m "$(MSG)"
