@@ -7,7 +7,7 @@ from urllib.parse import urlencode
 
 import requests
 
-from logger import Logger
+from ..logger import Logger
 
 
 class BaseAPIClient:
