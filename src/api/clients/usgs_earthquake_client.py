@@ -7,7 +7,7 @@ from typing import Any
 
 import requests
 
-from ..api.base_api import BaseAPIClient
+from src.api.base_api import BaseAPIClient
 
 
 class USGSEarthquakeClient(BaseAPIClient):

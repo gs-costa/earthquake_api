@@ -13,8 +13,8 @@ Modules:
 __version__ = "1.0.0"
 __author__ = "gs-costa"
 
-from .api import BaseAPIClient
-from .clients import USGSEarthquakeClient
-from .logger import Logger
+from src.api import BaseAPIClient
+from src.api.clients import USGSEarthquakeClient
+from src.logger import Logger
 
 __all__ = ["BaseAPIClient", "USGSEarthquakeClient", "Logger"]

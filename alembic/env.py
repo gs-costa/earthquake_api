@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from src.app.core.config import Settings
+from src.app.config import Environment
 from src.app.database.models.base import BaseModel
 
 # this is the Alembic Config object, which provides
@@ -26,7 +26,7 @@ target_metadata = BaseModel.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option("sqlalchemy.url", Settings().POSTGRES_DATABASE_URI)
+config.set_main_option("sqlalchemy.url", Environment().POSTGRES_DATABASE_URI)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""

@@ -1,7 +1,7 @@
 from os import getenv
 
 
-class Settings:
+class Environment:
     POSTGRES_USER = getenv("POSTGRES_USER", "postgres")
     POSTGRES_PASSWORD = getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_DB = getenv("POSTGRES_DB", "postgres")
