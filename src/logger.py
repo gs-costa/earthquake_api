@@ -14,8 +14,6 @@ class Logger:
         self.logger = logging.getLogger(name or __name__)
         self.logger.setLevel(level)
 
-        # Only add handlers if not already configured
-        # This prevents duplicate logs when the root logger is already configured
         parent_has_handlers = bool(self.logger.parent and self.logger.parent.handlers)
         if not self.logger.handlers and not parent_has_handlers:
             # Console handler
