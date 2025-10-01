@@ -26,6 +26,7 @@ class EarthquakeUSGSETL:
             raise e
 
     def ingest_features(self, features: list[dict], metadata_id: uuid.UUID) -> None:
+        """Upsert features to database, updating existing records based on event_id."""
         if not features:
             self.logger.warning("No features to ingest")
             return
@@ -37,10 +38,10 @@ class EarthquakeUSGSETL:
 
         features_repository = DatabaseRepository(Features, self.db_session)
         try:
-            created_features = features_repository.bulk_create(features_db_list)
-            self.logger.info(f"Successfully ingested {len(created_features)} features")
+            upserted_count = features_repository.bulk_upsert(features_db_list, conflict_column="event_id")
+            self.logger.info(f"Successfully upserted {upserted_count} features")
         except Exception as e:
-            self.logger.error(f"Error ingesting features: {e}")
+            self.logger.error(f"Error upserting features: {e}")
             raise e
 
     def main(self, start_time: str, end_time: str):
@@ -75,4 +76,4 @@ class EarthquakeUSGSETL:
 
 
 if __name__ == "__main__":
-    EarthquakeUSGSETL().main(start_time="2025-01-01", end_time="2025-01-02")
+    EarthquakeUSGSETL().main(start_time="2024-03-01", end_time="2024-03-02")

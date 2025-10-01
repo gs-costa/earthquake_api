@@ -1,6 +1,8 @@
+import uuid
 from datetime import datetime
-from typing import Literal, TypeVar
+from typing import Any, Literal, TypeVar
 
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
@@ -42,6 +44,58 @@ class DatabaseRepository:
         except SQLAlchemyError as e:
             self.session.rollback()
             self.logger.error(f"Error bulk creating records: {e}")
+            raise e
+
+    def bulk_upsert(self, instances: list[b_model], conflict_column: str) -> int:
+        """
+        Bulk upsert records using PostgreSQL's INSERT ... ON CONFLICT ... DO UPDATE.
+
+        Args:
+            instances: List of model instances to upsert
+            conflict_column: The column name to check for conflicts (e.g., 'event_id')
+
+        Returns:
+            Number of records processed
+        """
+        if not instances:
+            self.logger.warning("No instances to upsert")
+            return 0
+
+        try:
+            # Convert instances to dictionaries, excluding None values for auto-generated columns
+            records = []
+            for instance in instances:
+                record = {}
+                for c in instance.__table__.columns:
+                    value = getattr(instance, c.name)
+                    # Skip None values for columns with defaults (id, created_at, etc.)
+                    if value is not None or not (c.default or c.server_default):
+                        record[c.name] = value
+                records.append(record)
+
+            # Create insert statement
+            stmt = insert(self.model).values(records)
+
+            # Get all columns except the conflict column and primary key for update
+            update_cols = {
+                c.name: stmt.excluded[c.name]
+                for c in self.model.__table__.columns
+                if c.name not in [conflict_column, "id", "created_at"]
+            }
+
+            # Create upsert statement
+            upsert_stmt = stmt.on_conflict_do_update(index_elements=[conflict_column], set_=update_cols)
+
+            # Execute the upsert
+            self.session.execute(upsert_stmt)
+            self.session.commit()
+
+            self.logger.info(f"Successfully upserted {len(records)} records")
+            return len(records)
+
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            self.logger.error(f"Error upserting records: {e}")
             raise e
 
     def get_by_date_range(
@@ -90,4 +144,28 @@ class DatabaseRepository:
 
         except SQLAlchemyError as e:
             self.logger.error(f"Error filtering records by date range: {e}")
+            raise e
+
+    def get_by_id(self, id: uuid.UUID) -> BaseModel | None:
+        try:
+            return self.session.query(self.model).filter(self.model.id == id).first()
+        except SQLAlchemyError as e:
+            self.logger.error(f"Error fetching record by id: {id}, error: {e}")
+            raise e
+
+    def update(self, id: uuid.UUID | None, **kwargs: Any) -> BaseModel | None:
+        if not id:
+            raise ValueError("id is required")
+        try:
+            instance = self.get_by_id(id)
+            if instance:
+                for key, value in kwargs.items():
+                    setattr(instance, key, value)
+                self.session.commit()
+                self.session.refresh(instance)
+                return instance
+            return None
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            self.logger.error(f"Error updating record id: {id}, error: {e}")
             raise e

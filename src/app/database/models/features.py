@@ -36,7 +36,7 @@ class Features(BaseModel):
     latitude = Column(DECIMAL, nullable=True)
     longitude = Column(DECIMAL, nullable=True)
     depth = Column(DECIMAL, nullable=True)
-    event_id = Column(String, nullable=False)
+    event_id = Column(String, nullable=False, unique=True)
     metadata_id = Column(PostgresUUID(as_uuid=True), ForeignKey("metadatas.id", ondelete="CASCADE"), nullable=False)
 
     metadatas = relationship("Metadatas", back_populates="features")
