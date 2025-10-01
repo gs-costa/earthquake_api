@@ -1,0 +1,47 @@
+{
+	"info": {
+		"_postman_id": "314cb53e-17c8-4de9-a176-c1242147b5f6",
+		"name": "Earthquake",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37151517"
+	},
+	"item": [
+		{
+			"name": "features",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/features/?start_time=2024-03-03&end_time=2024-03-04",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"features",
+						""
+					],
+					"query": [
+						{
+							"key": "start_time",
+							"value": "2024-03-03"
+						},
+						{
+							"key": "end_time",
+							"value": "2024-03-04"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
