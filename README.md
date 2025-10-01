@@ -1,51 +1,105 @@
-# Earthquake API real-time ETL Service
+# Earthquake API - Real-time ETL Service
 
-Ingestion data from open API https://earthquake.usgs.gov/fdsnws/event/1/
-Transform its json in 2 relationals tables: metadatas and features (have a foreign key, metadata_id, with metadatas)
-Store data in Postgres database hosted by Docker, it's schemas are in folder src/app/database/models. Features upsert data, metadatas append only.
-Metadatas table has when the API request was generated, url with params used, status code, results count for audit trail.
-Provided endpoint /features/ which accepts start_time and end_time as params
-Table execution_logs have informations about requests in endpoint /features/
+A real-time ETL service that ingests earthquake data from the USGS API, transforms it into relational database tables, and provides filtered query capabilities.
 
-## Project organization
+## Overview
 
--- add project tree
+This service fetches earthquake data from the [USGS Earthquake API](https://earthquake.usgs.gov/fdsnws/event/1/) on-demand when users request data, processes it through an ETL pipeline, and stores it in PostgreSQL. It provides a RESTful API for querying earthquake data by date range.
 
-## How it works
+### Key Features
 
-1. Endpoint /features/ is requested, it calls real-time ETL of data provided by USGS Earthquake API.
-    - ingest JSON format data
-    - transform to sql table
-    - load metada (append only) and features (upsert by event_id) to PostgreSQL database
-2. App filter in PostgreSQL table features for dates between start_time and end_time, which user provided in params.
-3. Load request informations in execution_logs table.
-4. User receive data filtered in format application/json.
+- **On-demand ETL**: Real-time data ingestion from USGS API triggered by user requests
+- **Relational Storage**: Data stored in PostgreSQL with proper schema design
+- **Date Range Queries**: Filter earthquake data by start and end times
+- **Audit Trail**: Tracks API requests and data processing metadata
+- **Dockerized**: Easy deployment with Docker Compose
+
+## Architecture
+
+The service transforms USGS JSON data into two main tables:
+
+- **`metadatas`**: Audit information (append-only)
+  - API request details, URL parameters, status codes, result counts
+- **`features`**: Earthquake data (upsert by event_id)
+  - Foreign key relationship with metadatas table
+
+## API Endpoints
+
+### GET /features/
+
+Query earthquake data within a specified date range.
+
+**Parameters:**
+- `start_time`: Start date for filtering (ISO format)
+- `end_time`: End date for filtering (ISO format)
+
+**Response:** JSON array of earthquake features
 
 ## Setup
 
-### Pre-requisites
+### Prerequisites
 
+- Python 3.12+
+- Docker & Docker Compose
 - Git
-- Python ^3.12
-- Docker
 
-### MacOS commands
+### Installation
 
-Clone repository to your local machine
-
-```
+1. Clone the repository:
+```bash
 git clone git@github.com:gs-costa/earthquake_api.git
+cd earthquake_api
 ```
 
-Open terminal, with Docker running, type the following code:
-
-```
+2. Start the service:
+```bash
 bash start_pipe.sh
 ```
-This command will run a script that will activate
 
-### Use API
+This comprehensive startup script will:
 
-Import collection `Earthquake.postman_collection.json` to your Postman app or
-visit http://127.0.0.1:8000/docs or http://127.0.0.1:8000/redoc to access documentation.
+**Environment Setup:**
+- Check for required tools (Python 3.12+, Docker, Docker Compose)
+- Create `.env` file with database configuration if it doesn't exist
+- Create and activate Python virtual environment
+- Install Poetry package manager
+- Install all project dependencies
+
+**Database Setup:**
+- Start PostgreSQL database using Docker Compose
+- Wait for database to be ready (with health checks)
+- Run Alembic database migrations to create tables
+
+**Application Launch:**
+- Start the FastAPI server with auto-reload enabled
+- Server available at http://localhost:8000
+- Automatic cleanup on exit (Ctrl+C)
+
+**Features:**
+- Colored output for better visibility
+- Error handling and validation
+- Database readiness checks
+- Graceful shutdown with cleanup
+
+### Usage
+
+Once running, access the API through:
+
+- **API Documentation**: http://127.0.0.1:8000/docs (Swagger UI)
+- **Alternative Docs**: http://127.0.0.1:8000/redoc (ReDoc)
+- **Postman Collection**: Import `Earthquake.postman_collection.json`
+
+## Project Structure
+
+```
+src/
+├── api/                    # API client for USGS
+├── app/                    # Main application
+│   ├── config/            # Configuration management
+│   ├── database/          # Database models and config
+│   ├── domains/           # API endpoints and schemas
+│   ├── middlewares/       # Request/response middleware
+│   └── repositories/      # Data access layer
+└── data_integration/      # ETL pipeline components
+```
 
