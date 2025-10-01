@@ -1,5 +1,7 @@
 import uuid
 
+from fastapi import HTTPException, status
+
 from src.api.clients.usgs_earthquake_client import USGSEarthquakeClient
 from src.app.database.config import SessionLocal
 from src.app.database.models import Features, Metadatas
@@ -66,9 +68,11 @@ class EarthquakeUSGSETL:
                 return metadata_id
             else:
                 self.logger.error(f"Error: {response.status_code} - {response.text}")
-
-        except Exception as e:
-            self.logger.error(f"Error occurred: {e}")
+                if "matching events exceeds search limit of 20000" in response.text:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Matching events exceeds search limit of 20000, choose a minor range of dates",
+                    )
 
         finally:
             self.client.close()
