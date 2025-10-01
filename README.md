@@ -45,6 +45,7 @@ Get earthquake data optimized for map visualization.
 - `end_time`: End date for filtering (YYYY-MM-DD format)
 - `min_magnitude`: Minimum magnitude filter (default: 0.0)
 - `max_magnitude`: Maximum magnitude filter (default: 10.0)
+- `fetch_new_data`: Whether to fetch new data from USGS API or use existing database data (default: true)
 
 **Response:** JSON object with earthquake data optimized for mapping, including coordinates, magnitude, and metadata
 
@@ -60,8 +61,9 @@ Interactive HTML map visualization of earthquake data.
   - 🟠 Orange: 6.0-8.0 (Strong)
   - 🔴 Red: 8.0+ (Great)
 - **Interactive controls** for date range and magnitude filtering
+- **Data source toggle** to choose between fetching new data from USGS API or using existing database data
 - **Detailed popups** with earthquake information
-- **Real-time statistics** display
+- **Real-time statistics** display including data source indicator
 - **Responsive design** for desktop and mobile
 
 **Response:** HTML page with interactive Leaflet.js map
@@ -141,6 +143,7 @@ src/
 
 The interactive map visualization provides:
 
+- **Flexible Data Sources**: Choose between fetching fresh data from USGS API or using existing database data
 - **Real-time Data**: Fetches fresh earthquake data from USGS API (limited to 20,000 results)
 - **Smart Filtering**: Filter by date range and magnitude thresholds
 - **Visual Indicators**: Marker size and color based on earthquake magnitude
@@ -150,6 +153,7 @@ The interactive map visualization provides:
   - Timestamp
   - Tsunami alerts
   - USGS alert levels
+- **Data Source Tracking**: Clear indication of whether data comes from USGS API or database
 - **Error Handling**: Clear error messages for invalid date ranges or API limits
 - **Responsive Design**: Works on desktop and mobile devices
 

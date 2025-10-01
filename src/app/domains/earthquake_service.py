@@ -28,6 +28,7 @@ class EarthquakeService:
         response_model: type[T],
         order_by: str = "time",
         order: Literal["asc", "desc"] = "desc",
+        fetch_new_data: bool = True,
     ) -> list[T]:
         """
         Get earthquake data within a date range with common processing.
@@ -38,15 +39,19 @@ class EarthquakeService:
             response_model: Pydantic model class for response formatting
             order_by: Column to order by (default: "time")
             order: Order direction (default: "desc")
+            fetch_new_data: Whether to fetch new data from USGS API (default: True)
 
         Returns:
-            Tuple of (formatted_features, metadata_id)
+            List of formatted features
         """
 
         validate_date_format(start_time, end_time)
 
-        metadata_id = EarthquakeUSGSETL().main(start_time=start_time, end_time=end_time)
-        self.request.state.metadata_id = metadata_id
+        if fetch_new_data:
+            metadata_id = EarthquakeUSGSETL().main(start_time=start_time, end_time=end_time)
+            self.request.state.metadata_id = metadata_id
+        else:
+            self.request.state.metadata_id = None
 
         database_repository = DatabaseRepository(Features, self.db_session)
 

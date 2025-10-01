@@ -14,6 +14,7 @@ def get_earthquake_map_data(
     end_time: str = Query(description="End time in YYYY-MM-DD format"),
     min_magnitude: float = Query(default=0.0, description="Minimum magnitude filter"),
     max_magnitude: float = Query(default=10.0, description="Maximum magnitude filter"),
+    fetch_new_data: bool = Query(default=True, description="Whether to fetch new data from USGS API"),
 ):
     """
     Get earthquake data optimized for map visualization.
@@ -24,13 +25,14 @@ def get_earthquake_map_data(
         end_time: End date in YYYY-MM-DD format
         min_magnitude: Minimum magnitude to include
         max_magnitude: Maximum magnitude to include
+        fetch_new_data: Whether to fetch new data from USGS API or use existing database data
 
     Returns:
         JSON response with earthquake data optimized for mapping
     """
     earthquake_service = EarthquakeService(request)
     map_points = earthquake_service.get_earthquake_data(
-        start_time=start_time, end_time=end_time, response_model=EarthquakeMapPoint
+        start_time=start_time, end_time=end_time, response_model=EarthquakeMapPoint, fetch_new_data=fetch_new_data
     )
 
     filtered_map_points = [
@@ -212,6 +214,15 @@ def get_earthquake_map_view(request: Request):
                 border-radius: 50%;
                 border: 2px solid #333;
             }
+            
+            .data-source-indicator {
+                background: #e3f2fd;
+                color: #1976d2;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                font-weight: 500;
+                border-left: 4px solid #1976d2;
+            }
         </style>
     </head>
     <body>
@@ -240,6 +251,14 @@ def get_earthquake_map_view(request: Request):
                 <input type="number" id="maxMag" value="10" min="0" max="10" step="0.1">
             </div>
             
+            <div class="control-group">
+                <label for="fetchNewData">Data Source</label>
+                <select id="fetchNewData">
+                    <option value="true">Fetch New Data (USGS API)</option>
+                    <option value="false">Use Database Data</option>
+                </select>
+            </div>
+            
             <button class="btn" onclick="loadEarthquakeData()">Load Earthquakes</button>
         </div>
         
@@ -255,6 +274,10 @@ def get_earthquake_map_view(request: Request):
             <div class="stat-item">
                 <div class="stat-value" id="dateRange">-</div>
                 <div class="stat-label">Date Range</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="dataSource">-</div>
+                <div class="stat-label">Data Source</div>
             </div>
         </div>
         
@@ -329,6 +352,7 @@ def get_earthquake_map_view(request: Request):
                 const endDate = document.getElementById('endDate').value;
                 const minMag = document.getElementById('minMag').value;
                 const maxMag = document.getElementById('maxMag').value;
+                const fetchNewData = document.getElementById('fetchNewData').value;
                 
                 if (!startDate || !endDate) {
                     alert('Please select both start and end dates');
@@ -337,11 +361,11 @@ def get_earthquake_map_view(request: Request):
                 
                 const button = document.querySelector('.btn');
                 button.disabled = true;
-                button.textContent = 'Loading...';
+                button.textContent = fetchNewData === 'true' ? 'Fetching New Data...' : 'Loading from Database...';
                 
                 let response;
                 try {
-                    response = await fetch(`/visualization/map?start_time=${startDate}&end_time=${endDate}&min_magnitude=${minMag}&max_magnitude=${maxMag}`);
+                    response = await fetch(`/visualization/map?start_time=${startDate}&end_time=${endDate}&min_magnitude=${minMag}&max_magnitude=${maxMag}&fetch_new_data=${fetchNewData}`);
                     
                     if (!response.ok) {
                         // Try to get error details from response
@@ -419,6 +443,7 @@ def get_earthquake_map_view(request: Request):
                 const totalCount = document.getElementById('totalCount');
                 const maxMagnitude = document.getElementById('maxMagnitude');
                 const dateRange = document.getElementById('dateRange');
+                const dataSource = document.getElementById('dataSource');
                 
                 totalCount.textContent = data.total_count;
                 
@@ -426,6 +451,9 @@ def get_earthquake_map_view(request: Request):
                 maxMagnitude.textContent = maxMag.toFixed(1);
                 
                 dateRange.textContent = `${data.date_range.start} to ${data.date_range.end}`;
+                
+                const fetchNewData = document.getElementById('fetchNewData').value;
+                dataSource.textContent = fetchNewData === 'true' ? 'USGS API' : 'Database';
                 
                 statsDiv.style.display = 'flex';
             }
