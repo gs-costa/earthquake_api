@@ -12,6 +12,7 @@ This service fetches earthquake data from the [USGS Earthquake API](https://eart
 - **Relational Storage**: Data stored in PostgreSQL with proper schema design
 - **Date Range Queries**: Filter earthquake data by start and end times
 - **Interactive Map Visualization**: Visual earthquake data with color-coded markers by magnitude
+- **Basic Authentication**: HTTP Basic Auth protection for all API endpoints
 - **Audit Trail**: Tracks API requests and data processing metadata
 - **Dockerized**: Easy deployment with Docker Compose
 
@@ -25,6 +26,19 @@ The service transforms USGS JSON data into two main tables:
   - Foreign key relationship with metadatas table
 
 ## API Endpoints
+
+> **🔐 Authentication Required**: All API endpoints (except documentation) require HTTP Basic Authentication.
+> 
+> **Default Credentials:**
+> - Username: `admin`
+> - Password: `admin`
+> 
+> **Usage Example:**
+> ```bash
+> curl -u admin:admin "http://localhost:8000/features/?start_time=2024-01-01&end_time=2024-01-02"
+> ```
+
+> Note: Username and password could be customized in .env file.
 
 ### GET /features/
 
@@ -118,10 +132,12 @@ This comprehensive startup script will:
 
 Once running, access the API through:
 
-- **API Documentation**: http://127.0.0.1:8000/docs (Swagger UI)
-- **Alternative Docs**: http://127.0.0.1:8000/redoc (ReDoc)
-- **Interactive Map**: http://127.0.0.1:8000/visualization/map-view
+- **API Documentation**: http://127.0.0.1:8000/docs (Swagger UI) - No auth required
+- **Alternative Docs**: http://127.0.0.1:8000/redoc (ReDoc) - No auth required
+- **Interactive Map**: http://127.0.0.1:8000/visualization/map-view - **Requires authentication**
 - **Postman Collection**: Import `Earthquake.postman_collection.json`
+
+> **Note**: When accessing the interactive map in a browser, you'll need to enter the credentials when prompted by the browser's authentication dialog.
 
 ## Project Structure
 
@@ -135,6 +151,9 @@ src/
 │   │   ├── features/      # Earthquake data endpoints
 │   │   └── visualization/ # Map visualization endpoints
 │   ├── middlewares/       # Request/response middleware
+│   │   ├── authentication.py    # HTTP Basic Auth middleware
+│   │   ├── database_session.py  # Database session management
+│   │   └── execution_logs.py    # Request logging
 │   └── repositories/      # Data access layer
 └── data_integration/      # ETL pipeline components
 ```

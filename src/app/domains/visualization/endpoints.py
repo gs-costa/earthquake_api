@@ -325,7 +325,6 @@ def get_earthquake_map_view(request: Request):
             function getMagnitudeColor(mag) {
                 // Convert to number to ensure proper comparison
                 const magnitude = parseFloat(mag) || 0;
-                console.log('Magnitude:', magnitude, 'Type:', typeof magnitude);
                 
                 if (magnitude >= 8.0) return '#F44336'; // Red - Great
                 if (magnitude >= 6.0) return '#FF9800'; // Orange - Strong

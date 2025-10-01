@@ -10,3 +10,7 @@ class Environment:
     POSTGRES_DATABASE_URI = (
         f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
+
+    API_USERNAME = getenv("API_USERNAME", "admin")
+    API_PASSWORD = getenv("API_PASSWORD", "admin")
+    API_REALM = getenv("API_REALM", "EarthquakeAPI")

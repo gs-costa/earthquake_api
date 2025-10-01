@@ -10,7 +10,19 @@
 			"name": "features",
 			"request": {
 				"auth": {
-					"type": "noauth"
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
 				},
 				"method": "GET",
 				"header": [
@@ -21,7 +33,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{base_url}}/features/?start_time=2024-03-03&end_time=2024-03-04",
+					"raw": "{{base_url}}/features/?start_time=2024-04-03&end_time=2024-04-04",
 					"host": [
 						"{{base_url}}"
 					],
@@ -32,11 +44,11 @@
 					"query": [
 						{
 							"key": "start_time",
-							"value": "2024-03-03"
+							"value": "2024-04-03"
 						},
 						{
 							"key": "end_time",
-							"value": "2024-03-04"
+							"value": "2024-04-04"
 						}
 					]
 				}

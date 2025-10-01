@@ -91,6 +91,9 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_DB=postgres
 POSTGRES_PORT=5432
 POSTGRES_HOST=localhost
+API_USERNAME=admin
+API_PASSWORD=admin
+API_REALM=EarthquakeAPI
 EOF
     print_success ".env file created with default values"
 else
