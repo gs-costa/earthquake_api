@@ -1,12 +1,7 @@
-from datetime import datetime
-
 from fastapi import APIRouter, Query, Request
 
-from src.app.config.params import validate_date_format
-from src.app.database.models import Features
+from src.app.domains.earthquake_service import EarthquakeService
 from src.app.domains.features.schema import FeaturesResponse
-from src.app.repositories.database_repository import DatabaseRepository
-from src.data_integration.earthquake_usgs import EarthquakeUSGSETL
 
 features_router = APIRouter(prefix="/features", tags=["features"])
 
@@ -28,21 +23,9 @@ def get_features(
     Returns:
         JSON response with list of earthquake features within the specified date range
     """
-    # Validate date format
-    validate_date_format(start_time, end_time)
-
-    metadata_id = EarthquakeUSGSETL().main(start_time=start_time, end_time=end_time)
-    request.state.metadata_id = metadata_id
-
-    database_repository = DatabaseRepository(Features, request.state.db_session)
-
-    start_time_fmt = datetime.strptime(start_time, "%Y-%m-%d")
-    end_time_fmt = datetime.strptime(end_time, "%Y-%m-%d")
-
-    features = database_repository.get_by_date_range(
-        date_column="time", start_time=start_time_fmt, end_time=end_time_fmt, order_by="time", order="desc"
+    earthquake_service = EarthquakeService(request)
+    features_json = earthquake_service.get_earthquake_data(
+        start_time=start_time, end_time=end_time, response_model=FeaturesResponse
     )
-
-    features_json = [FeaturesResponse.model_validate(feature) for feature in features]
 
     return features_json

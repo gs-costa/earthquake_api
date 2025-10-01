@@ -2,6 +2,7 @@ from fastapi import FastAPI, responses
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.app.domains.features.endpoints import features_router
+from src.app.domains.visualization.endpoints import visualization_router
 from src.app.middlewares.database_session import DatabaseSessionMiddleware
 from src.app.middlewares.execution_logs import ExecutionLogsMiddleware
 
@@ -13,6 +14,7 @@ app = FastAPI(
 )
 
 app.include_router(features_router)
+app.include_router(visualization_router)
 
 app.add_middleware(
     CORSMiddleware,

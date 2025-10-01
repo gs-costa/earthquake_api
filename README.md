@@ -11,6 +11,7 @@ This service fetches earthquake data from the [USGS Earthquake API](https://eart
 - **On-demand ETL**: Real-time data ingestion from USGS API triggered by user requests
 - **Relational Storage**: Data stored in PostgreSQL with proper schema design
 - **Date Range Queries**: Filter earthquake data by start and end times
+- **Interactive Map Visualization**: Visual earthquake data with color-coded markers by magnitude
 - **Audit Trail**: Tracks API requests and data processing metadata
 - **Dockerized**: Easy deployment with Docker Compose
 
@@ -34,6 +35,36 @@ Query earthquake data within a specified date range.
 - `end_time`: End date for filtering (ISO format)
 
 **Response:** JSON array of earthquake features
+
+### GET /visualization/map
+
+Get earthquake data optimized for map visualization.
+
+**Parameters:**
+- `start_time`: Start date for filtering (YYYY-MM-DD format)
+- `end_time`: End date for filtering (YYYY-MM-DD format)
+- `min_magnitude`: Minimum magnitude filter (default: 0.0)
+- `max_magnitude`: Maximum magnitude filter (default: 10.0)
+
+**Response:** JSON object with earthquake data optimized for mapping, including coordinates, magnitude, and metadata
+
+### GET /visualization/map-view
+
+Interactive HTML map visualization of earthquake data.
+
+**Features:**
+- **Color-coded markers** by magnitude:
+  - 🟢 Green: 0.0-2.0 (Minor)
+  - 🟢 Light Green: 2.0-4.0 (Light)
+  - 🟡 Yellow: 4.0-6.0 (Moderate)
+  - 🟠 Orange: 6.0-8.0 (Strong)
+  - 🔴 Red: 8.0+ (Great)
+- **Interactive controls** for date range and magnitude filtering
+- **Detailed popups** with earthquake information
+- **Real-time statistics** display
+- **Responsive design** for desktop and mobile
+
+**Response:** HTML page with interactive Leaflet.js map
 
 ## Setup
 
@@ -87,6 +118,7 @@ Once running, access the API through:
 
 - **API Documentation**: http://127.0.0.1:8000/docs (Swagger UI)
 - **Alternative Docs**: http://127.0.0.1:8000/redoc (ReDoc)
+- **Interactive Map**: http://127.0.0.1:8000/visualization/map-view
 - **Postman Collection**: Import `Earthquake.postman_collection.json`
 
 ## Project Structure
@@ -98,8 +130,26 @@ src/
 │   ├── config/            # Configuration management
 │   ├── database/          # Database models and config
 │   ├── domains/           # API endpoints and schemas
+│   │   ├── features/      # Earthquake data endpoints
+│   │   └── visualization/ # Map visualization endpoints
 │   ├── middlewares/       # Request/response middleware
 │   └── repositories/      # Data access layer
 └── data_integration/      # ETL pipeline components
 ```
+
+## Visualization Features
+
+The interactive map visualization provides:
+
+- **Real-time Data**: Fetches fresh earthquake data from USGS API (limited to 20,000 results)
+- **Smart Filtering**: Filter by date range and magnitude thresholds
+- **Visual Indicators**: Marker size and color based on earthquake magnitude
+- **Rich Information**: Click markers for detailed earthquake data including:
+  - Location and coordinates
+  - Magnitude and depth
+  - Timestamp
+  - Tsunami alerts
+  - USGS alert levels
+- **Error Handling**: Clear error messages for invalid date ranges or API limits
+- **Responsive Design**: Works on desktop and mobile devices
 

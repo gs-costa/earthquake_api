@@ -16,6 +16,6 @@ class ExecutionLogs(BaseModel):
     status_code = Column(Integer, nullable=False, comment="Status code returned.")
     parameters = Column(JSON, nullable=True, comment="Parameters sent to the endpoint.")
     created_at = Column(DateTime, default=lambda: datetime.now(), comment="Creation time of the execution.")
-    metadata_id = Column(PostgresUUID(as_uuid=True), ForeignKey("metadatas.id", ondelete="CASCADE"), nullable=False)
+    metadata_id = Column(PostgresUUID(as_uuid=True), ForeignKey("metadatas.id", ondelete="CASCADE"), nullable=True)
 
     metadatas = relationship("Metadatas", back_populates="execution_logs")

@@ -15,6 +15,7 @@ class ExecutionLogsMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         logger = Logger(__name__)
         start_time = time.time()
+        request.state.metadata_id = None
         response: Response = await call_next(request)
         execution_time = time.time() - start_time
         if request.url.path not in ENDPOINTS_TO_BYPASS:
