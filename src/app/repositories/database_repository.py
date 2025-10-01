@@ -31,21 +31,6 @@ class DatabaseRepository:
             self.logger.error(f"Error creating record: {instance}, error: {e}")
             raise e
 
-    def bulk_create(self, instances: list[b_model]) -> list[b_model]:
-        """Create multiple records in a single transaction for better performance."""
-        try:
-            self.session.add_all(instances)
-            self.session.commit()
-
-            for instance in instances:
-                self.session.refresh(instance)
-            self.logger.info(f"Successfully bulk created {len(instances)} records")
-            return instances
-        except SQLAlchemyError as e:
-            self.session.rollback()
-            self.logger.error(f"Error bulk creating records: {e}")
-            raise e
-
     def bulk_upsert(self, instances: list[b_model], conflict_column: str) -> int:
         """
         Bulk upsert records using PostgreSQL's INSERT ... ON CONFLICT ... DO UPDATE.
