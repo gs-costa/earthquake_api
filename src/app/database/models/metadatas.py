@@ -15,3 +15,4 @@ class Metadatas(BaseModel):
     count = Column(Integer, nullable=False)
 
     features = relationship("Features", back_populates="metadatas")
+    execution_logs = relationship("ExecutionLogs", back_populates="metadatas")

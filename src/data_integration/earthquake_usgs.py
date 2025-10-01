@@ -62,6 +62,7 @@ class EarthquakeUSGSETL:
                     self.logger.info(f"Successfully processed {len(features)} earthquake features")
                 else:
                     self.logger.warning("No features found in the response")
+                return metadata_id
             else:
                 self.logger.error(f"Error: {response.status_code} - {response.text}")
 

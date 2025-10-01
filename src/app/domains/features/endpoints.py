@@ -6,6 +6,7 @@ from src.app.config.params import validate_date_format
 from src.app.database.models import Features
 from src.app.domains.features.schema import FeaturesResponse
 from src.app.repositories.database_repository import DatabaseRepository
+from src.data_integration.earthquake_usgs import EarthquakeUSGSETL
 
 features_router = APIRouter(prefix="/features", tags=["features"])
 
@@ -29,6 +30,9 @@ def get_features(
     """
     # Validate date format
     validate_date_format(start_time, end_time)
+
+    metadata_id = EarthquakeUSGSETL().main(start_time=start_time, end_time=end_time)
+    request.state.metadata_id = metadata_id
 
     database_repository = DatabaseRepository(Features, request.state.db_session)
 

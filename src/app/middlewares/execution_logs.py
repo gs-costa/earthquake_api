@@ -24,6 +24,7 @@ class ExecutionLogsMiddleware(BaseHTTPMiddleware):
                 execution_time=round(execution_time, 2),
                 status_code=int(response.status_code),
                 parameters=dict(request.query_params),
+                metadata_id=request.state.metadata_id,
             )
 
             repository = DatabaseRepository(model=ExecutionLogs, session=db)
